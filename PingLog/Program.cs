@@ -225,26 +225,22 @@ namespace PingLog
             int timeoutCount = 0;
             string host = null;
             bool ttlExp = false;
-           
+            Stopwatch stopwatch = new Stopwatch();
 
+            //Run multiple times per Ttl
             for (int i = 0; i < 3; i++)
             {
+                stopwatch.Restart();
                 reply = pinger.Send(hostNameOrAddress, timeout, buffer, pingerOptions);
+                stopwatch.Stop();
                 switch (reply.Status)
                 {
                     case IPStatus.Success:
-                        times.Append(string.Format("{0,6} ms", reply.RoundtripTime));
-                        host = reply.Address.ToString();
-                        break;
                     case IPStatus.TtlExpired:
+                        times.Append(string.Format("{0,6} ms", stopwatch.ElapsedMilliseconds)); //reply.RoundtripTime));
                         host = reply.Address.ToString();
-                        for (; i < 3; i++)
-                        {
-                            reply = pinger.Send(hostNameOrAddress, timeout, buffer);
-                            times.Append(string.Format("{0,6} ms", reply.RoundtripTime));
-                        }
-                        ttlExp = true;
-                        goto breakFor;
+                        ttlExp = reply.Status == IPStatus.TtlExpired;
+                        break;
                     case IPStatus.TimedOut:
                         times.Append("     *   ");
                         timeoutCount++;
@@ -254,7 +250,7 @@ namespace PingLog
                         return;
                 }
             }
-            breakFor:
+            
             if (timeoutCount == 3)
             {
                 WriteTraceHopStatus(ttl, times.ToString(), "Request timed out.");
