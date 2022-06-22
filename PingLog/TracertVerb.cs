@@ -14,15 +14,23 @@ namespace PingLog
         public TracertVerb(TracertCmdOptions options) : base("Tracert", options)
         {
             pinger = new Ping();
+            buffer = BuildBuffer(options.BufferSize);
         }
 
         public override void Run()
         {
-            while (true)
+            string ip = Options.GetIpHost();
+            for (int i = 1; i <= Options.Count; i++)
             {
                 try
                 {
-                    TraceRoute();
+                    WriteLog("");
+                    WriteLog($"Tracing route to {Options.Host}({ip}) over a maximum of {Options.MaxHops} hops");
+                    WriteLog("");
+                    WriteLog("Hop  [------ Trip Times -----]  Address");
+                    TraceRoute(ip, 1);
+                    WriteLog("");
+                    WriteLog($"Trace seq {i} completed.");
                 }
                 catch (System.Exception ex)
                 {
@@ -33,23 +41,12 @@ namespace PingLog
             }
         }
 
-        private void TraceRoute()
-        {
-            WriteLog("");
-            WriteLog($"Tracing route to {Options.Host} over a maximum of {Options.MaxHops} hops");
-            WriteLog("");
-            WriteLog("Hop  [------ Trip Times -----]  Address");
-            TraceRoute(1);
-            WriteLog("");
-            WriteLog("Trace completed.");
-        }
-
         /// <summary>
         /// Do not call directly
         /// </summary>
         /// <param name="hostNameOrAddress"></param>
         /// <param name="hop"></param>
-        private void TraceRoute(int hop)
+        private void TraceRoute(string hostIP, int hop)
         {
             if (hop > Options.MaxHops)
             {
@@ -58,7 +55,7 @@ namespace PingLog
             }
 
             PingOptions pingerOptions = new PingOptions(hop, true);
-            int timeout = 8000;
+
 
             PingReply? reply = default(PingReply);
             StringBuilder times = new StringBuilder();
@@ -71,8 +68,8 @@ namespace PingLog
             for (int i = 0; i < 3; i++)
             {
                 stopwatch.Restart();
-                reply = pinger.Send(Options.Host!, timeout, buffer, pingerOptions);
-                
+                reply = pinger.Send(hostIP, Options.Timeout, buffer, pingerOptions);
+
                 stopwatch.Stop();
                 switch (reply.Status)
                 {
@@ -95,7 +92,7 @@ namespace PingLog
             if (timeoutCount == 3)
             {
                 WriteTraceHopStatus(hop, times.ToString(), "Request timed out.");
-                TraceRoute(hop + 1);
+                TraceRoute(hostIP, hop + 1);
             }
             else
             {
@@ -103,7 +100,7 @@ namespace PingLog
                 if (ttlExp)
                 {
                     //recurse to get the next address...
-                    TraceRoute(hop + 1);
+                    TraceRoute(hostIP, hop + 1);
                 }
             }
 

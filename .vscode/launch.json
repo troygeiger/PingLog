@@ -11,8 +11,8 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/PingLog/bin/Debug/net6.0/PingLog.dll",
-            "args": ["tracert", "-h", "google.com"],
-            "cwd": "${workspaceFolder}/PingLog",
+            "args": ["ping", "-h", "google.com"],
+            "cwd": "${workspaceFolder}/PingLog/bin/Debug/net6.0",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false

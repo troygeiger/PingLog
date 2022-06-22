@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace PingLog
 {
     internal abstract class VerbBase<T> where T : CmdOptionsBase
@@ -18,6 +20,8 @@ namespace PingLog
                 throw new DirectoryNotFoundException("Path defined does not exist.");
             }
 
+            
+
             if (!File.Exists(options.OutPath))
             {
                 WriteLog("*****************************************");
@@ -25,6 +29,7 @@ namespace PingLog
                 WriteLog("* https://github.com/troygeiger/PingLog *");
                 WriteLog("*****************************************");
                 WriteLog("");
+                WriteLog($"Host={options.Host}");
             }
         }
 
@@ -47,6 +52,17 @@ namespace PingLog
             {
 
             }
+        }
+
+        protected virtual byte[] BuildBuffer(int size)
+        {
+            byte b = System.Text.Encoding.ASCII.GetBytes("a")[0];
+            byte[] buffer = new byte[size];
+            for (var i = 0; i < size; i++)
+            {
+                buffer[i] = b;
+            }
+            return buffer;
         }
 
         public T Options { get; }
