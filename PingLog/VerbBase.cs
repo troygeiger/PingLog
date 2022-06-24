@@ -20,7 +20,7 @@ namespace PingLog
                 throw new DirectoryNotFoundException("Path defined does not exist.");
             }
 
-            
+
 
             if (!File.Exists(options.OutPath))
             {
@@ -29,7 +29,7 @@ namespace PingLog
                 WriteLog("* https://github.com/troygeiger/PingLog *");
                 WriteLog("*****************************************");
                 WriteLog("");
-                WriteLog($"Host={options.Host}");
+                WriteLog($"Parameters={Environment.CommandLine}");
             }
         }
 
@@ -43,7 +43,9 @@ namespace PingLog
         protected void WriteLog(string message)
         {
             message = $"[{DateTime.Now}] {message}\r\n";
-            Console.Write(message);
+
+            if (WriteToConsole) Console.Write(message);
+
             try
             {
                 File.AppendAllText(Options.OutPath!, message);
@@ -53,6 +55,8 @@ namespace PingLog
 
             }
         }
+
+        protected bool WriteToConsole { get; set; }
 
         protected virtual byte[] BuildBuffer(int size)
         {

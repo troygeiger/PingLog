@@ -1,1 +1,1 @@
-dotnet ./PingLog/PingLog.csproj publish -c Release -p:PublishSingleFile=true -p:SelfContained=true -r linux-x64 -p:AssemblyName=pinglog
+dotnet publish ./PingLog/PingLog.csproj -c Release -p:PublishSingleFile=true --self-contained -r linux-x64 -p:AssemblyName=pinglog

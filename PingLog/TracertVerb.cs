@@ -93,16 +93,16 @@ namespace PingLog
             {
                 WriteTraceHopStatus(hop, times.ToString(), "Request timed out.");
                 TraceRoute(hostIP, hop + 1);
+                return;
             }
-            else
+
+            writeTrace(hop, host, times.ToString());
+            if (ttlExp)
             {
-                writeTrace(hop, host, times.ToString());
-                if (ttlExp)
-                {
-                    //recurse to get the next address...
-                    TraceRoute(hostIP, hop + 1);
-                }
+                //recurse to get the next address...
+                TraceRoute(hostIP, hop + 1);
             }
+
 
         }
 

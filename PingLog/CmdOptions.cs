@@ -37,7 +37,7 @@ internal class CmdOptionsBase
         }
         catch (System.Exception)
         {
-            return Host;
+            return Host!;
         }
     }
 
@@ -46,6 +46,12 @@ internal class CmdOptionsBase
 [Verb("ping", true, HelpText = "Run a continuous ping against a host.")]
 internal class PingCmdOption : CmdOptionsBase
 {
+
+    [Option('u', "only-unsuccessful", HelpText = "Add this flag to only output when a ping is unsuccessful.", Default = false)]
+    public bool OnlyOutputUnsuccessful { get; set; } = false;
+
+    [Option('r', "runtime", HelpText = "Specify how long the ping log should run. Format=(h)h:mm:ss")]
+    public string? RuntimeString { get; set; }
 
 }
 
